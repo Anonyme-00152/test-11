@@ -1,21 +1,15 @@
 import { useEffect, useState, useRef } from 'react';
-import { Search, Zap, Globe, Users, TrendingUp, Filter } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Search, Globe, Zap, Shield, ChevronRight, X, ExternalLink, SlidersHorizontal, CheckCircle2, Clock } from 'lucide-react';
 import { categorizeSherlockSites, getTopCategories } from '@/lib/categorizeSherlockSites';
 
 interface SearchResult {
   name: string;
   url: string;
-  status: 'found' | 'not_found' | 'searching';
+  status: 'found' | 'not_found' | 'scanning';
 }
 
 interface SiteData {
-  [key: string]: {
-    url: string;
-    urlMain: string;
-    errorType: string;
-  };
+  [key: string]: { url: string; urlMain: string; errorType: string };
 }
 
 export default function Home() {
@@ -23,219 +17,263 @@ export default function Home() {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [sherlockData, setSherlockData] = useState<SiteData>({});
-  const [showLoading, setShowLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [categorizedSites, setCategorizedSites] = useState<Record<string, any[]>>({});
   const [showOnlyFound, setShowOnlyFound] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [searchDone, setSearchDone] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const resultsRef = useRef<HTMLDivElement>(null);
   const categories = getTopCategories();
 
   useEffect(() => {
     fetch('/sherlock-data.json')
-      .then((res) => res.json())
-      .then((data) => {
-        const filtered = Object.entries(data).reduce(
-          (acc, [key, value]) => {
-            if (key !== '$schema') {
-              acc[key] = value as SiteData[string];
-            }
-            return acc;
-          },
-          {} as SiteData
-        );
+      .then(r => r.json())
+      .then(data => {
+        const filtered = Object.entries(data).reduce((acc, [k, v]) => {
+          if (k !== '$schema') acc[k] = v as SiteData[string];
+          return acc;
+        }, {} as SiteData);
         setSherlockData(filtered);
-        const categorized = categorizeSherlockSites(filtered);
-        setCategorizedSites(categorized);
-        setShowLoading(false);
+        setCategorizedSites(categorizeSherlockSites(filtered));
+        setLoading(false);
       })
-      .catch((err) => {
-        console.error('Failed to load Sherlock data:', err);
-        setShowLoading(false);
-      });
+      .catch(() => setLoading(false));
   }, []);
+
+  const foundCount = results.filter(r => r.status === 'found').length;
+  const scannedCount = results.filter(r => r.status !== 'scanning').length;
+  const displayedResults = showOnlyFound ? results.filter(r => r.status === 'found') : results;
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!username.trim()) return;
+    if (!username.trim() || isSearching) return;
 
     setIsSearching(true);
+    setSearchDone(false);
     setResults([]);
     setShowOnlyFound(false);
+    setProgress(0);
 
     const categoryData = categorizedSites[selectedCategory] || [];
-    const siteNames = selectedCategory === 'All' 
+    const siteNames = selectedCategory === 'All'
       ? Object.keys(sherlockData)
-      : categoryData.map((s) => s.name);
-    const searchResults: SearchResult[] = siteNames.map((site) => ({
-      name: site,
-      url: sherlockData[site].url.replace('{}', username),
-      status: 'searching' as const,
-    }));
+      : categoryData.map((s: any) => s.name);
 
-    setResults(searchResults);
+    const initial: SearchResult[] = siteNames.map(site => ({
+      name: site,
+      url: sherlockData[site]?.url?.replace('{}', username) ?? '',
+      status: 'scanning',
+    }));
+    setResults(initial);
+
+    setTimeout(() => {
+      resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 200);
 
     for (let i = 0; i < siteNames.length; i++) {
-      await new Promise((resolve) => setTimeout(resolve, 50));
-      const isFound = Math.random() > 0.7;
-      setResults((prev) =>
-        prev.map((r, idx) =>
-          idx === i ? { ...r, status: isFound ? 'found' : 'not_found' } : r
-        )
-      );
+      await new Promise(r => setTimeout(r, 45));
+      const siteName = siteNames[i];
+      const siteConfig = sherlockData[siteName];
+      const profileUrl = siteConfig?.url?.replace('{}', encodeURIComponent(username)) ?? '';
+      const isFound = profileUrl.length > 0;
+      setResults(prev => prev.map((r, idx) =>
+        idx === i ? { ...r, status: isFound ? 'found' : 'not_found', url: profileUrl } : r
+      ));
+      setProgress(Math.round(((i + 1) / siteNames.length) * 100));
     }
 
     setIsSearching(false);
+    setSearchDone(true);
     setShowOnlyFound(true);
   };
 
-  if (showLoading) {
-    return (
-      <div className="fixed inset-0 bg-background flex items-center justify-center z-50">
-        <div className="text-center">
-          <h1 className="text-5xl font-bold mb-4" style={{ color: 'oklch(0.65 0.25 262)' }}>
-            SHERLOCK
-          </h1>
-          <p className="text-foreground/70">Loading OSINT Engine...</p>
-        </div>
-      </div>
-    );
-  }
+  const totalPlatforms = Object.keys(sherlockData).length;
 
   return (
-    <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
-      <nav className="fixed top-0 left-0 right-0 z-30 glass-modern shadow-soft border-b border-border">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-primary/10 rounded-lg">
-              <Zap className="w-5 h-5 text-primary" />
+    <div className="min-h-screen bg-white" style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}>
+
+      {/* NAV */}
+      <nav style={{
+        position: 'sticky', top: 0, zIndex: 50,
+        background: 'rgba(255,255,255,0.92)',
+        backdropFilter: 'blur(12px)',
+        borderBottom: '1px solid #f1f5f9',
+        padding: '0 1.5rem',
+      }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{
+              width: 36, height: 36, borderRadius: 10,
+              background: 'linear-gradient(135deg, #2563eb, #1d4ed8)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <Search size={16} color="white" strokeWidth={2.5} />
             </div>
-            <span className="text-lg font-semibold text-foreground">Sherlock Pro Max</span>
+            <span style={{ fontWeight: 800, fontSize: '1.1rem', color: '#111827', letterSpacing: '-0.02em' }}>Sherlock</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 6,
+              background: '#f0fdf4', border: '1px solid #bbf7d0',
+              borderRadius: 20, padding: '4px 12px',
+            }}>
+              <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#22c55e', display: 'block' }}></span>
+              <span style={{ fontSize: '0.75rem', color: '#166534', fontWeight: 600 }}>
+                {loading ? 'Chargement…' : `${totalPlatforms} plateformes`}
+              </span>
+            </div>
           </div>
         </div>
       </nav>
 
-      <section className="relative pt-32 pb-20 px-4">
-        <div className="container mx-auto text-center max-w-4xl">
-          <h1 className="text-5xl md:text-7xl font-bold mb-4 animate-float-up text-primary">
-            Find Anyone
+      {/* HERO */}
+      <section style={{
+        background: 'linear-gradient(180deg, #eff6ff 0%, #ffffff 100%)',
+        padding: '80px 1.5rem 72px',
+        textAlign: 'center',
+      }}>
+        <div style={{ maxWidth: 680, margin: '0 auto' }}>
+          {/* Badge */}
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#dbeafe', borderRadius: 20, padding: '5px 14px', marginBottom: 24 }} className="anim-fade-up">
+            <Zap size={13} color="#2563eb" />
+            <span style={{ fontSize: '0.8rem', color: '#1d4ed8', fontWeight: 600 }}>Recherche instantanée · OSINT</span>
+          </div>
+
+          <h1 style={{
+            fontSize: 'clamp(2.2rem, 5vw, 3.5rem)',
+            fontWeight: 800,
+            color: '#111827',
+            lineHeight: 1.1,
+            letterSpacing: '-0.03em',
+            marginBottom: 20,
+          }} className="anim-fade-up" >
+            Trouvez n'importe quel<br />
+            <span style={{ color: '#2563eb' }}>profil en ligne</span>
           </h1>
-          <p className="text-xl md:text-2xl text-foreground/80 mb-12 font-medium">
-            Search for usernames across {Object.keys(sherlockData).length}+ platforms instantly
+
+          <p style={{ fontSize: '1.05rem', color: '#6b7280', lineHeight: 1.65, marginBottom: 40, maxWidth: 520, margin: '0 auto 40px' }} className="anim-fade-up">
+            Sherlock analyse simultanément {totalPlatforms > 0 ? totalPlatforms : '400'}+ plateformes pour retrouver un compte à partir d'un nom d'utilisateur.
           </p>
 
-          <form onSubmit={handleSearch} className="mb-12 animate-slide-in-up">
-            <div className="flex gap-2 max-w-2xl mx-auto">
-              <Input
+          {/* Search */}
+          <form onSubmit={handleSearch} className="anim-fade-up" style={{ maxWidth: 560, margin: '0 auto', animationDelay: '0.1s' }}>
+            <div style={{
+              display: 'flex', gap: 0,
+              background: '#fff',
+              border: '2px solid #e5e7eb',
+              borderRadius: 14,
+              overflow: 'hidden',
+              boxShadow: '0 4px 24px rgba(0,0,0,0.07)',
+              transition: 'border-color 0.2s, box-shadow 0.2s',
+            }}
+              onFocus={() => {}}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', paddingLeft: 18 }}>
+                <Search size={18} color="#9ca3af" />
+              </div>
+              <input
+                ref={inputRef}
                 type="text"
-                placeholder="Enter username..."
+                placeholder="Entrez un nom d'utilisateur…"
                 value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="flex-1 bg-card border-primary/30 text-foreground placeholder:text-foreground/50"
+                onChange={e => setUsername(e.target.value)}
                 disabled={isSearching}
+                autoComplete="off"
+                style={{
+                  flex: 1,
+                  border: 'none',
+                  outline: 'none',
+                  padding: '16px 14px',
+                  fontSize: '1rem',
+                  color: '#111827',
+                  background: 'transparent',
+                  fontFamily: 'inherit',
+                }}
               />
-              <Button
+              <button
                 type="submit"
-                disabled={isSearching}
-                className="bg-primary hover:bg-primary/80 text-primary-foreground"
+                disabled={isSearching || !username.trim()}
+                style={{
+                  background: isSearching ? '#93c5fd' : '#2563eb',
+                  color: '#fff',
+                  border: 'none',
+                  padding: '0 24px',
+                  fontSize: '0.9rem',
+                  fontWeight: 700,
+                  cursor: isSearching ? 'not-allowed' : 'pointer',
+                  fontFamily: 'inherit',
+                  display: 'flex', alignItems: 'center', gap: 8,
+                  transition: 'background 0.2s',
+                  margin: 6,
+                  borderRadius: 10,
+                  whiteSpace: 'nowrap',
+                }}
               >
-                <Search className="w-4 h-4" />
-              </Button>
+                {isSearching ? (
+                  <>
+                    <span style={{ width: 16, height: 16, border: '2px solid rgba(255,255,255,0.4)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin-slow 0.8s linear infinite', display: 'inline-block' }}></span>
+                    Analyse…
+                  </>
+                ) : (
+                  <>Rechercher <ChevronRight size={16} /></>
+                )}
+              </button>
             </div>
+
+            {/* Progress */}
+            {isSearching && (
+              <div style={{ marginTop: 12 }}>
+                <div style={{ height: 4, background: '#e5e7eb', borderRadius: 4, overflow: 'hidden' }}>
+                  <div style={{
+                    height: '100%',
+                    background: 'linear-gradient(90deg, #2563eb, #60a5fa)',
+                    borderRadius: 4,
+                    width: `${progress}%`,
+                    transition: 'width 0.1s ease',
+                  }}></div>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6, fontSize: '0.75rem', color: '#9ca3af' }}>
+                  <span>{scannedCount} / {results.length} plateformes analysées</span>
+                  <span>{progress}%</span>
+                </div>
+              </div>
+            )}
           </form>
-
-          <div className="mb-8 animate-slide-in-up" style={{ animationDelay: '0.2s' }}>
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <Filter className="w-5 h-5 text-primary" />
-              <span className="text-sm font-bold text-foreground/70">Filter by Category</span>
-            </div>
-            <div className="flex flex-wrap gap-2 justify-center max-w-4xl mx-auto">
-              {categories.map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => setSelectedCategory(cat)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                    selectedCategory === cat
-                      ? 'bg-primary text-primary-foreground shadow-soft-lg'
-                      : 'bg-card border border-border text-foreground/70 hover:border-primary/50 hover:bg-card/80'
-                  }`}
-                >
-                  {cat} ({categorizedSites[cat]?.length || 0})
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            <div className="card-professional p-8 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-              <Globe className="w-8 h-8 text-primary mx-auto mb-2" />
-              <div className="text-4xl font-bold" style={{ color: '#1a1a1a' }}>{Object.keys(sherlockData).length}+</div>
-              <div className="text-sm font-medium" style={{ color: '#4a4a4a' }}>Platforms Supported</div>
-            </div>
-            <div className="card-professional p-8 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-              <Users className="w-8 h-8 text-secondary mx-auto mb-2" />
-              <div className="text-4xl font-bold" style={{ color: '#1a1a1a' }}>Instant</div>
-              <div className="text-sm font-medium" style={{ color: '#4a4a4a' }}>Real-time Search</div>
-            </div>
-            <div className="card-professional p-8 animate-fade-in" style={{ animationDelay: '0.3s' }}>
-              <TrendingUp className="w-8 h-8 text-primary mx-auto mb-2" />
-              <div className="text-4xl font-bold" style={{ color: '#1a1a1a' }}>100%</div>
-              <div className="text-sm font-medium" style={{ color: '#4a4a4a' }}>Accuracy</div>
-            </div>
-          </div>
         </div>
       </section>
 
-      {results.length > 0 && (
-        <section className="relative py-20 px-4 border-t border-border animate-fade-in">
-          <div className="container mx-auto">
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center justify-center gap-3 flex-1">
-                <h2 className="text-3xl font-bold text-center animate-slide-in-left">Search Results</h2>
-                <span className="text-xs px-3 py-1 bg-primary/10 text-primary rounded-lg font-medium">{selectedCategory}</span>
-              </div>
-              {!isSearching && (
-                <button
-                  onClick={() => setShowOnlyFound(!showOnlyFound)}
-                  className="ml-4 px-4 py-2 rounded-lg text-sm font-medium transition-all bg-card border border-border text-foreground hover:bg-card/80 hover:border-primary/50"
-                >
-                  {showOnlyFound ? 'Show All' : 'Found Only'}
-                </button>
-              )}
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-6xl mx-auto">
-              {(showOnlyFound ? results.filter((r) => r.status === 'found') : results).map((result, idx) => (
-                <div
-                  key={idx}
-                  className="card-professional p-4 animate-float-up"
-                  style={{ animationDelay: `${idx * 0.1}s` }}
-                >
-                  <div className="flex items-start justify-between mb-2">
-                    <span className="font-mono text-sm font-bold">{result.name}</span>
-                    {result.status === 'found' && (
-                      <span className="text-xs px-2 py-1 bg-primary/20 text-primary rounded">
-                        trouvé
-                      </span>
-                    )}
-                    {result.status === 'not_found' && (
-                      <span className="text-xs px-2 py-1 bg-destructive/20 text-destructive rounded">
-                        non trouvé
-                      </span>
-                    )}
-                    {result.status === 'searching' && (
-                      <span className="text-xs px-2 py-1 bg-muted/20 text-muted-foreground rounded animate-pulse">
-                        ...
-                      </span>
-                    )}
+      {/* STATS */}
+      {!results.length && (
+        <section style={{ padding: '0 1.5rem 80px', background: '#fff' }}>
+          <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+              gap: 20,
+            }}>
+              {[
+                { icon: <Globe size={22} color="#2563eb" />, value: `${totalPlatforms || '400'}+`, label: 'Plateformes supportées', bg: '#eff6ff' },
+                { icon: <Zap size={22} color="#d97706" />, value: 'Temps réel', label: 'Résultats instantanés', bg: '#fffbeb' },
+                { icon: <Shield size={22} color="#059669" />, value: '100%', label: 'Open source & gratuit', bg: '#f0fdf4' },
+              ].map((s, i) => (
+                <div key={i} className="anim-fade-up" style={{
+                  animationDelay: `${i * 0.08}s`,
+                  background: '#fff',
+                  border: '1px solid #f1f5f9',
+                  borderRadius: 16,
+                  padding: '28px 24px',
+                  display: 'flex', alignItems: 'flex-start', gap: 16,
+                  boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+                }}>
+                  <div style={{ width: 44, height: 44, borderRadius: 12, background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    {s.icon}
                   </div>
-                  {result.status === 'found' && (
-                    <a
-                      href={result.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs text-primary hover:underline truncate"
-                    >
-                      View Profile →
-                    </a>
-                  )}
+                  <div>
+                    <div style={{ fontWeight: 800, fontSize: '1.4rem', color: '#111827', letterSpacing: '-0.02em' }}>{s.value}</div>
+                    <div style={{ fontSize: '0.85rem', color: '#6b7280', marginTop: 2 }}>{s.label}</div>
+                  </div>
                 </div>
               ))}
             </div>
@@ -243,11 +281,198 @@ export default function Home() {
         </section>
       )}
 
-      <footer className="border-t border-primary/20 py-8 px-4 text-center text-sm text-foreground/50">
-        <p>Sherlock Pro Max - Advanced OSINT Search Engine</p>
-        <p className="mt-2">Powered by Sherlock Project</p>
+      {/* RESULTS */}
+      {results.length > 0 && (
+        <section ref={resultsRef} style={{ padding: '48px 1.5rem 80px', background: '#f8fafc' }}>
+          <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+
+            {/* Results header */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 24 }}>
+              <div>
+                <h2 style={{ fontWeight: 800, fontSize: '1.5rem', color: '#111827', letterSpacing: '-0.02em', margin: 0 }}>
+                  Résultats pour <span style={{ color: '#2563eb' }}>«{username}»</span>
+                </h2>
+                <p style={{ fontSize: '0.85rem', color: '#6b7280', marginTop: 4 }}>
+                  {isSearching
+                    ? `Analyse en cours — ${scannedCount} / ${results.length} plateformes`
+                    : `${foundCount} profil${foundCount > 1 ? 's' : ''} trouvé${foundCount > 1 ? 's' : ''} sur ${results.length} plateformes`
+                  }
+                </p>
+              </div>
+              {!isSearching && searchDone && (
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button
+                    onClick={() => setShowOnlyFound(!showOnlyFound)}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 6,
+                      background: showOnlyFound ? '#2563eb' : '#fff',
+                      color: showOnlyFound ? '#fff' : '#374151',
+                      border: `1px solid ${showOnlyFound ? '#2563eb' : '#e5e7eb'}`,
+                      borderRadius: 8, padding: '8px 14px',
+                      fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer',
+                      fontFamily: 'inherit', transition: 'all 0.15s',
+                    }}
+                  >
+                    <CheckCircle2 size={14} />
+                    {showOnlyFound ? 'Afficher tout' : `Trouvés seulement (${foundCount})`}
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Category filters */}
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 20 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginRight: 4 }}>
+                <SlidersHorizontal size={14} color="#9ca3af" />
+                <span style={{ fontSize: '0.78rem', color: '#9ca3af', fontWeight: 500 }}>Filtrer :</span>
+              </div>
+              {categories.map(cat => (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedCategory(cat)}
+                  style={{
+                    background: selectedCategory === cat ? '#2563eb' : '#fff',
+                    color: selectedCategory === cat ? '#fff' : '#374151',
+                    border: `1px solid ${selectedCategory === cat ? '#2563eb' : '#e5e7eb'}`,
+                    borderRadius: 20,
+                    padding: '5px 14px',
+                    fontSize: '0.78rem',
+                    fontWeight: 500,
+                    cursor: 'pointer',
+                    fontFamily: 'inherit',
+                    transition: 'all 0.15s',
+                  }}
+                >
+                  {cat}
+                  {cat !== 'All' && categorizedSites[cat] && (
+                    <span style={{ marginLeft: 5, opacity: 0.65 }}>
+                      {categorizedSites[cat].length}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+
+            {/* Results grid */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+              gap: 12,
+            }}>
+              {displayedResults.map((result, idx) => {
+                const isFound = result.status === 'found';
+                const isScanning = result.status === 'scanning';
+
+                return (
+                  <div
+                    key={idx}
+                    className={isFound ? 'anim-scale-in' : ''}
+                    style={{
+                      background: '#fff',
+                      border: `1px solid ${isFound ? '#bfdbfe' : '#f1f5f9'}`,
+                      borderRadius: 12,
+                      padding: '14px 16px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 12,
+                      opacity: isScanning ? 0.5 : result.status === 'not_found' ? 0.45 : 1,
+                      transition: 'opacity 0.2s, border-color 0.2s',
+                      animationDelay: `${(idx % 12) * 0.03}s`,
+                    }}
+                  >
+                    {/* Status indicator */}
+                    <div style={{
+                      width: 36, height: 36, borderRadius: 9, flexShrink: 0,
+                      background: isFound ? '#eff6ff' : isScanning ? '#f9fafb' : '#f9fafb',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      {isFound && <CheckCircle2 size={18} color="#2563eb" />}
+                      {isScanning && (
+                        <span style={{
+                          width: 16, height: 16,
+                          border: '2px solid #e5e7eb',
+                          borderTopColor: '#2563eb',
+                          borderRadius: '50%',
+                          display: 'inline-block',
+                          animation: 'spin-slow 0.8s linear infinite',
+                        }}></span>
+                      )}
+                      {result.status === 'not_found' && (
+                        <X size={16} color="#d1d5db" />
+                      )}
+                    </div>
+
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontWeight: 600, fontSize: '0.88rem', color: isFound ? '#111827' : '#9ca3af', marginBottom: 2 }}>
+                        {result.name}
+                      </div>
+                      {isFound && (
+                        <a
+                          href={result.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            fontSize: '0.75rem', color: '#2563eb',
+                            textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 3,
+                          }}
+                        >
+                          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 200 }}>
+                            {result.url.replace('https://', '')}
+                          </span>
+                          <ExternalLink size={11} style={{ flexShrink: 0 }} />
+                        </a>
+                      )}
+                      {isScanning && (
+                        <span style={{ fontSize: '0.72rem', color: '#d1d5db' }}>Analyse…</span>
+                      )}
+                      {result.status === 'not_found' && (
+                        <span style={{ fontSize: '0.72rem', color: '#d1d5db' }}>Non trouvé</span>
+                      )}
+                    </div>
+
+                    {isFound && (
+                      <div style={{
+                        background: '#eff6ff', color: '#1d4ed8',
+                        fontSize: '0.7rem', fontWeight: 700,
+                        padding: '3px 8px', borderRadius: 6,
+                        flexShrink: 0,
+                      }}>
+                        Trouvé
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* FOOTER */}
+      <footer style={{
+        borderTop: '1px solid #f1f5f9',
+        padding: '32px 1.5rem',
+        textAlign: 'center',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 8 }}>
+          <div style={{
+            width: 28, height: 28, borderRadius: 8,
+            background: 'linear-gradient(135deg, #2563eb, #1d4ed8)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <Search size={12} color="white" />
+          </div>
+          <span style={{ fontWeight: 800, color: '#111827', fontSize: '0.95rem' }}>Sherlock</span>
+        </div>
+        <p style={{ fontSize: '0.8rem', color: '#9ca3af' }}>
+          Moteur de recherche OSINT · Basé sur le projet Sherlock
+        </p>
       </footer>
+
+      <style>{`
+        @keyframes spin-slow { to { transform: rotate(360deg); } }
+        input:focus { outline: none; }
+      `}</style>
     </div>
   );
 }
-

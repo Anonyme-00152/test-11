@@ -325,3 +325,23 @@
   background: linear-gradient(90deg, transparent, oklch(0.45 0.15 250 / 20%), transparent);
   background-size: 1000px 100%;
 }
+
+
+/* Modern Design Animation Classes */
+.anim-fade-up {
+  animation: float-up 0.5s ease-out both;
+}
+
+.anim-fade-in {
+  animation: fade-in 0.4s ease-out both;
+}
+
+.anim-scale-in {
+  animation: scale-in 0.4s ease-out both;
+}
+
+@keyframes spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
