@@ -79,4 +79,12 @@
 - [x] Refactoriser la page d'accueil avec le nouveau design
 - [x] Affiner les composants UI et les micro-interactions
 - [x] Tester et valider le nouveau design professionnel (23 tests passes)
-- [ ] Sauvegarder et livrer le site avec le nouveau theme
+- [x] Sauvegarder et livrer le site avec le nouveau theme
+
+
+## Bugfix: Readability Issues
+
+- [x] Corriger la lisibilite du texte sur le fond sombre
+- [x] Augmenter le contraste des elements texte
+- [x] Verifier la lisibilite sur tous les elements (titres, labels, descriptions)
+- [x] Tester et valider la lisibilite

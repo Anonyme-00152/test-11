@@ -118,7 +118,7 @@ export default function Home() {
           <h1 className="text-5xl md:text-7xl font-bold mb-4 animate-float-up text-primary">
             Find Anyone
           </h1>
-          <p className="text-xl md:text-2xl text-foreground/60 mb-12 font-light">
+          <p className="text-xl md:text-2xl text-foreground/80 mb-12 font-medium">
             Search for usernames across {Object.keys(sherlockData).length}+ platforms instantly
           </p>
 
@@ -167,18 +167,18 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
             <div className="card-professional p-8 animate-fade-in" style={{ animationDelay: '0.1s' }}>
               <Globe className="w-8 h-8 text-primary mx-auto mb-2" />
-              <div className="text-3xl font-bold">{Object.keys(sherlockData).length}+</div>
-              <div className="text-sm text-foreground/70">Platforms Supported</div>
+              <div className="text-4xl font-bold" style={{ color: '#1a1a1a' }}>{Object.keys(sherlockData).length}+</div>
+              <div className="text-sm font-medium" style={{ color: '#4a4a4a' }}>Platforms Supported</div>
             </div>
-            <div className="card-professional p-8 animate-fade-in-violet" style={{ animationDelay: '0.2s' }}>
+            <div className="card-professional p-8 animate-fade-in" style={{ animationDelay: '0.2s' }}>
               <Users className="w-8 h-8 text-secondary mx-auto mb-2" />
-              <div className="text-3xl font-bold">Instant</div>
-              <div className="text-sm text-foreground/70">Real-time Search</div>
+              <div className="text-4xl font-bold" style={{ color: '#1a1a1a' }}>Instant</div>
+              <div className="text-sm font-medium" style={{ color: '#4a4a4a' }}>Real-time Search</div>
             </div>
             <div className="card-professional p-8 animate-fade-in" style={{ animationDelay: '0.3s' }}>
               <TrendingUp className="w-8 h-8 text-primary mx-auto mb-2" />
-              <div className="text-3xl font-bold">100%</div>
-              <div className="text-sm text-foreground/70">Accuracy</div>
+              <div className="text-4xl font-bold" style={{ color: '#1a1a1a' }}>100%</div>
+              <div className="text-sm font-medium" style={{ color: '#4a4a4a' }}>Accuracy</div>
             </div>
           </div>
         </div>
