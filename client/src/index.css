@@ -242,4 +242,202 @@
     }
   }
 }
-\n/* Keyframe Animations */\n@keyframes glitch-anim {\n  0% {\n    clip-path: inset(40% 0 61% 0);\n    transform: translate(0);\n  }\n  20% {\n    clip-path: inset(92% 0 1% 0);\n    transform: translate(-2px, 2px);\n  }\n  40% {\n    clip-path: inset(43% 0 1% 0);\n    transform: translate(-2px, -2px);\n  }\n  60% {\n    clip-path: inset(25% 0 58% 0);\n    transform: translate(2px, -2px);\n  }\n  80% {\n    clip-path: inset(54% 0 7% 0);\n    transform: translate(2px, 2px);\n  }\n  100% {\n    clip-path: inset(58% 0 43% 0);\n    transform: translate(0);\n  }\n}\n\n@keyframes glitch-before {\n  0% {\n    clip-path: inset(40% 0 61% 0);\n    transform: translate(-2px, -2px);\n  }\n  20% {\n    clip-path: inset(92% 0 1% 0);\n    transform: translate(2px, 2px);\n  }\n  40% {\n    clip-path: inset(43% 0 1% 0);\n    transform: translate(-2px, 2px);\n  }\n  60% {\n    clip-path: inset(25% 0 58% 0);\n    transform: translate(2px, -2px);\n  }\n  80% {\n    clip-path: inset(54% 0 7% 0);\n    transform: translate(-2px, -2px);\n  }\n  100% {\n    clip-path: inset(58% 0 43% 0);\n    transform: translate(0);\n  }\n}\n\n@keyframes glitch-after {\n  0% {\n    clip-path: inset(25% 0 58% 0);\n    transform: translate(2px, 2px);\n  }\n  20% {\n    clip-path: inset(54% 0 7% 0);\n    transform: translate(-2px, -2px);\n  }\n  40% {\n    clip-path: inset(58% 0 43% 0);\n    transform: translate(2px, -2px);\n  }\n  60% {\n    clip-path: inset(40% 0 61% 0);\n    transform: translate(-2px, 2px);\n  }\n  80% {\n    clip-path: inset(92% 0 1% 0);\n    transform: translate(2px, 2px);\n  }\n  100% {\n    clip-path: inset(43% 0 1% 0);\n    transform: translate(0);\n  }\n}\n\n@keyframes pulse-glow {\n  0%, 100% {\n    box-shadow: 0 0 10px oklch(0.65 0.25 262 / 50%), inset 0 0 10px oklch(0.65 0.25 262 / 10%);\n  }\n  50% {\n    box-shadow: 0 0 20px oklch(0.65 0.25 262 / 80%), inset 0 0 20px oklch(0.65 0.25 262 / 20%);\n  }\n}\n\n@keyframes float-up {\n  0% {\n    opacity: 0;\n    transform: translateY(20px);\n  }\n  100% {\n    opacity: 1;\n    transform: translateY(0);\n  }\n}\n\n@keyframes slide-in-left {\n  0% {\n    opacity: 0;\n    transform: translateX(-30px);\n  }\n  100% {\n    opacity: 1;\n    transform: translateX(0);\n  }\n}\n\n@keyframes slide-in-right {\n  0% {\n    opacity: 0;\n    transform: translateX(30px);\n  }\n  100% {\n    opacity: 1;\n    transform: translateX(0);\n  }\n}\n\n@keyframes fade-in {\n  0% {\n    opacity: 0;\n  }\n  100% {\n    opacity: 1;\n  }\n}\n\n@keyframes scan-line-move {\n  0% {\n    transform: translateY(-100%);\n  }\n  100% {\n    transform: translateY(100vh);\n  }\n}\n\n@keyframes particle-float {\n  0%, 100% {\n    transform: translateY(0) translateX(0);\n    opacity: 1;\n  }\n  50% {\n    opacity: 0.5;\n  }\n}\n\n@keyframes progress-bar {\n  0% {\n    width: 0%;\n  }\n  100% {\n    width: 100%;\n  }\n}\n\n/* Utility Classes */\n.animate-glitch {\n  animation: glitch-anim 0.3s infinite;\n}\n\n.animate-pulse-glow {\n  animation: pulse-glow 2s ease-in-out infinite;\n}\n\n.animate-float-up {\n  animation: float-up 0.6s ease-out;\n}\n\n.animate-slide-in-left {\n  animation: slide-in-left 0.6s ease-out;\n}\n\n.animate-slide-in-right {\n  animation: slide-in-right 0.6s ease-out;\n}\n\n.animate-fade-in {\n  animation: fade-in 0.6s ease-out;\n}\n\n.animate-scan-line {\n  animation: scan-line-move 8s linear infinite;\n}\n\n.animate-particle {\n  animation: particle-float 4s ease-in-out infinite;\n}\n\n.animate-progress {\n  animation: progress-bar 2.5s ease-in-out forwards;\n}\n
+
+/* Keyframe Animations */
+@keyframes glitch-anim {
+  0% {
+    clip-path: inset(40% 0 61% 0);
+    transform: translate(0);
+  }
+  20% {
+    clip-path: inset(92% 0 1% 0);
+    transform: translate(-2px, 2px);
+  }
+  40% {
+    clip-path: inset(43% 0 1% 0);
+    transform: translate(-2px, -2px);
+  }
+  60% {
+    clip-path: inset(25% 0 58% 0);
+    transform: translate(2px, -2px);
+  }
+  80% {
+    clip-path: inset(54% 0 7% 0);
+    transform: translate(2px, 2px);
+  }
+  100% {
+    clip-path: inset(58% 0 43% 0);
+    transform: translate(0);
+  }
+}
+
+@keyframes glitch-before {
+  0% {
+    clip-path: inset(40% 0 61% 0);
+    transform: translate(-2px, -2px);
+  }
+  20% {
+    clip-path: inset(92% 0 1% 0);
+    transform: translate(2px, 2px);
+  }
+  40% {
+    clip-path: inset(43% 0 1% 0);
+    transform: translate(-2px, 2px);
+  }
+  60% {
+    clip-path: inset(25% 0 58% 0);
+    transform: translate(2px, -2px);
+  }
+  80% {
+    clip-path: inset(54% 0 7% 0);
+    transform: translate(-2px, -2px);
+  }
+  100% {
+    clip-path: inset(58% 0 43% 0);
+    transform: translate(0);
+  }
+}
+
+@keyframes glitch-after {
+  0% {
+    clip-path: inset(25% 0 58% 0);
+    transform: translate(2px, 2px);
+  }
+  20% {
+    clip-path: inset(54% 0 7% 0);
+    transform: translate(-2px, -2px);
+  }
+  40% {
+    clip-path: inset(58% 0 43% 0);
+    transform: translate(2px, -2px);
+  }
+  60% {
+    clip-path: inset(40% 0 61% 0);
+    transform: translate(-2px, 2px);
+  }
+  80% {
+    clip-path: inset(92% 0 1% 0);
+    transform: translate(2px, 2px);
+  }
+  100% {
+    clip-path: inset(43% 0 1% 0);
+    transform: translate(0);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 10px oklch(0.65 0.25 262 / 50%), inset 0 0 10px oklch(0.65 0.25 262 / 10%);
+  }
+  50% {
+    box-shadow: 0 0 20px oklch(0.65 0.25 262 / 80%), inset 0 0 20px oklch(0.65 0.25 262 / 20%);
+  }
+}
+
+@keyframes float-up {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in-left {
+  0% {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-right {
+  0% {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes scan-line-move {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100vh);
+  }
+}
+
+@keyframes particle-float {
+  0%, 100% {
+    transform: translateY(0) translateX(0);
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes progress-bar {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+/* Utility Classes */
+.animate-glitch {
+  animation: glitch-anim 0.3s infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-float-up {
+  animation: float-up 0.6s ease-out;
+}
+
+.animate-slide-in-left {
+  animation: slide-in-left 0.6s ease-out;
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.6s ease-out;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out;
+}
+
+.animate-scan-line {
+  animation: scan-line-move 8s linear infinite;
+}
+
+.animate-particle {
+  animation: particle-float 4s ease-in-out infinite;
+}
+
+.animate-progress {
+  animation: progress-bar 2.5s ease-in-out forwards;
+}
+

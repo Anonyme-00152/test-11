@@ -12,9 +12,18 @@
 - [ ] Loading screen cinématique (optimisation)
 - [ ] Design responsive mobile-first (optimisation)t
 
-## UI/UX Components
+## Remaining Tasks
 
-- [ ] Particles animation system
+- [ ] Tester la recherche et l'affichage des résultats
+- [ ] Ajouter les animations glitch/particules avancées
+- [ ] Optimiser les performances mobile
+- [ ] Ajouter les tests unitaires vitest
+- [ ] Corriger l'erreur TypeScript server/_core/storageProxy.ts
+- [ ] Ajouter une section "Sites Supportés" complète
+- [ ] Ajouter un loading screen cinématique
+- [ ] Ajouter les transitions et micro-animations
+- [ ] Valider la responsivité sur mobile
+- [ ] Tester la recherche avec plusieurs noms d'utilisateur
 - [ ] Glitch text effect
 - [ ] Glassmorphism navigation
 - [ ] Result cards with status indicators
