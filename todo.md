@@ -14,10 +14,10 @@
 
 ## Remaining Tasks
 
+- [x] Ajouter les tests unitaires vitest (9 tests réussis)
 - [ ] Tester la recherche et l'affichage des résultats
 - [ ] Ajouter les animations glitch/particules avancées
 - [ ] Optimiser les performances mobile
-- [ ] Ajouter les tests unitaires vitest
 - [ ] Corriger l'erreur TypeScript server/_core/storageProxy.ts
 - [ ] Ajouter une section "Sites Supportés" complète
 - [ ] Ajouter un loading screen cinématique
