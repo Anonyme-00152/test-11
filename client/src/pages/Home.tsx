@@ -1,7 +1,8 @@
 import { useEffect, useState, useRef } from 'react';
-import { Search, Zap, Globe, Users, TrendingUp } from 'lucide-react';
+import { Search, Zap, Globe, Users, TrendingUp, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { categorizeSherlockSites, getTopCategories } from '@/lib/categorizeSherlockSites';
 
 interface SearchResult {
   name: string;
@@ -23,6 +24,9 @@ export default function Home() {
   const [isSearching, setIsSearching] = useState(false);
   const [sherlockData, setSherlockData] = useState<SiteData>({});
   const [showLoading, setShowLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [categorizedSites, setCategorizedSites] = useState<Record<string, any[]>>({});
+  const categories = getTopCategories();
 
   useEffect(() => {
     fetch('/sherlock-data.json')
@@ -38,6 +42,8 @@ export default function Home() {
           {} as SiteData
         );
         setSherlockData(filtered);
+        const categorized = categorizeSherlockSites(filtered);
+        setCategorizedSites(categorized);
         setShowLoading(false);
       })
       .catch((err) => {
@@ -53,7 +59,10 @@ export default function Home() {
     setIsSearching(true);
     setResults([]);
 
-    const siteNames = Object.keys(sherlockData);
+    const categoryData = categorizedSites[selectedCategory] || [];
+    const siteNames = selectedCategory === 'All' 
+      ? Object.keys(sherlockData)
+      : categoryData.map((s) => s.name);
     const searchResults: SearchResult[] = siteNames.map((site) => ({
       name: site,
       url: sherlockData[site].url.replace('{}', username),
@@ -128,6 +137,28 @@ export default function Home() {
             </div>
           </form>
 
+          <div className="mb-8 animate-slide-in-up" style={{ animationDelay: '0.2s' }}>
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <Filter className="w-5 h-5 text-primary" />
+              <span className="text-sm font-bold text-foreground/70">Filter by Category</span>
+            </div>
+            <div className="flex flex-wrap gap-2 justify-center max-w-4xl mx-auto">
+              {categories.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`px-4 py-2 rounded-lg text-sm font-mono transition-all ${
+                    selectedCategory === cat
+                      ? 'glass neon-glow border border-primary bg-primary/20 text-primary'
+                      : 'glass border border-primary/30 text-foreground/70 hover:border-primary/50'
+                  }`}
+                >
+                  {cat} ({categorizedSites[cat]?.length || 0})
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
             <div className="glass p-6 rounded-lg animate-fade-in neon-glow" style={{ animationDelay: '0.1s' }}>
               <Globe className="w-8 h-8 text-primary mx-auto mb-2" />
@@ -151,7 +182,10 @@ export default function Home() {
       {results.length > 0 && (
         <section className="relative py-20 px-4 border-t border-primary/20 animate-fade-in">
           <div className="container mx-auto">
-            <h2 className="text-3xl font-bold mb-8 text-center animate-slide-in-left">Search Results</h2>
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <h2 className="text-3xl font-bold text-center animate-slide-in-left">Search Results</h2>
+              <span className="text-xs px-3 py-1 bg-primary/20 text-primary rounded font-mono">{selectedCategory}</span>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-6xl mx-auto">
               {results.map((result, idx) => (
                 <div

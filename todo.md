@@ -51,3 +51,13 @@
 - [x] Performance audit
 - [x] Cross-browser testing
 - [x] Final checkpoint and delivery
+
+
+## New Feature: Category Filtering System
+
+- [x] Analyser la structure des donnees Sherlock pour identifier les categories
+- [x] Creer le composant de filtrage par categorie
+- [x] Implementer la logique de filtrage des resultats
+- [x] Ajouter les tests unitaires pour le filtrage (7 tests)
+- [x] Tester et valider le systeme de filtrage
+- [x] Sauvegarder et livrer la version finale avec filtrage
