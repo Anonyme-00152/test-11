@@ -101,14 +101,14 @@ export default function Home() {
 
       <section className="relative pt-32 pb-20 px-4">
         <div className="container mx-auto text-center max-w-4xl">
-          <h1 className="text-5xl md:text-7xl font-bold mb-6" style={{ color: 'oklch(0.65 0.25 262)' }}>
+          <h1 className="text-5xl md:text-7xl font-bold mb-6 animate-float-up glitch-text" data-text="FIND ANYONE" style={{ color: 'oklch(0.65 0.25 262)' }}>
             FIND ANYONE
           </h1>
           <p className="text-lg md:text-xl text-foreground/70 mb-8">
             Search for usernames across {Object.keys(sherlockData).length}+ platforms instantly
           </p>
 
-          <form onSubmit={handleSearch} className="mb-12">
+          <form onSubmit={handleSearch} className="mb-12 animate-slide-in-up">
             <div className="flex gap-2 max-w-2xl mx-auto">
               <Input
                 type="text"
@@ -129,17 +129,17 @@ export default function Home() {
           </form>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            <div className="glass p-6 rounded-lg">
+            <div className="glass p-6 rounded-lg animate-fade-in neon-glow" style={{ animationDelay: '0.1s' }}>
               <Globe className="w-8 h-8 text-primary mx-auto mb-2" />
               <div className="text-3xl font-bold">{Object.keys(sherlockData).length}+</div>
               <div className="text-sm text-foreground/70">Platforms Supported</div>
             </div>
-            <div className="glass p-6 rounded-lg">
+            <div className="glass p-6 rounded-lg animate-fade-in neon-glow-violet" style={{ animationDelay: '0.2s' }}>
               <Users className="w-8 h-8 text-secondary mx-auto mb-2" />
               <div className="text-3xl font-bold">Instant</div>
               <div className="text-sm text-foreground/70">Real-time Search</div>
             </div>
-            <div className="glass p-6 rounded-lg">
+            <div className="glass p-6 rounded-lg animate-fade-in neon-glow" style={{ animationDelay: '0.3s' }}>
               <TrendingUp className="w-8 h-8 text-primary mx-auto mb-2" />
               <div className="text-3xl font-bold">100%</div>
               <div className="text-sm text-foreground/70">Accuracy</div>
@@ -149,14 +149,15 @@ export default function Home() {
       </section>
 
       {results.length > 0 && (
-        <section className="relative py-20 px-4 border-t border-primary/20">
+        <section className="relative py-20 px-4 border-t border-primary/20 animate-fade-in">
           <div className="container mx-auto">
-            <h2 className="text-3xl font-bold mb-8 text-center">Search Results</h2>
+            <h2 className="text-3xl font-bold mb-8 text-center animate-slide-in-left">Search Results</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-6xl mx-auto">
               {results.map((result, idx) => (
                 <div
                   key={idx}
-                  className="glass p-4 rounded-lg border border-primary/20 hover:border-primary/50 transition"
+                  className="glass p-4 rounded-lg border border-primary/20 hover:border-primary/50 transition animate-float-up neon-glow"
+                  style={{ animationDelay: `${idx * 0.1}s` }}
                 >
                   <div className="flex items-start justify-between mb-2">
                     <span className="font-mono text-sm font-bold">{result.name}</span>
