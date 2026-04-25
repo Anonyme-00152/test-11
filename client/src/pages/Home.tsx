@@ -102,21 +102,23 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
-      <nav className="fixed top-0 left-0 right-0 z-30 glass backdrop-blur-md border-b border-primary/20">
+      <nav className="fixed top-0 left-0 right-0 z-30 glass-modern shadow-soft border-b border-border">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Zap className="w-6 h-6 text-primary" />
-            <span className="text-xl font-bold">SHERLOCK PRO MAX</span>
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <Zap className="w-5 h-5 text-primary" />
+            </div>
+            <span className="text-lg font-semibold text-foreground">Sherlock Pro Max</span>
           </div>
         </div>
       </nav>
 
       <section className="relative pt-32 pb-20 px-4">
         <div className="container mx-auto text-center max-w-4xl">
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 animate-float-up glitch-text" data-text="FIND ANYONE" style={{ color: 'oklch(0.65 0.25 262)' }}>
-            FIND ANYONE
+          <h1 className="text-5xl md:text-7xl font-bold mb-4 animate-float-up text-primary">
+            Find Anyone
           </h1>
-          <p className="text-lg md:text-xl text-foreground/70 mb-8">
+          <p className="text-xl md:text-2xl text-foreground/60 mb-12 font-light">
             Search for usernames across {Object.keys(sherlockData).length}+ platforms instantly
           </p>
 
@@ -150,10 +152,10 @@ export default function Home() {
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-4 py-2 rounded-lg text-sm font-mono transition-all ${
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                     selectedCategory === cat
-                      ? 'glass neon-glow border border-primary bg-primary/20 text-primary'
-                      : 'glass border border-primary/30 text-foreground/70 hover:border-primary/50'
+                      ? 'bg-primary text-primary-foreground shadow-soft-lg'
+                      : 'bg-card border border-border text-foreground/70 hover:border-primary/50 hover:bg-card/80'
                   }`}
                 >
                   {cat} ({categorizedSites[cat]?.length || 0})
@@ -163,17 +165,17 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            <div className="glass p-6 rounded-lg animate-fade-in neon-glow" style={{ animationDelay: '0.1s' }}>
+            <div className="card-professional p-8 animate-fade-in" style={{ animationDelay: '0.1s' }}>
               <Globe className="w-8 h-8 text-primary mx-auto mb-2" />
               <div className="text-3xl font-bold">{Object.keys(sherlockData).length}+</div>
               <div className="text-sm text-foreground/70">Platforms Supported</div>
             </div>
-            <div className="glass p-6 rounded-lg animate-fade-in neon-glow-violet" style={{ animationDelay: '0.2s' }}>
+            <div className="card-professional p-8 animate-fade-in-violet" style={{ animationDelay: '0.2s' }}>
               <Users className="w-8 h-8 text-secondary mx-auto mb-2" />
               <div className="text-3xl font-bold">Instant</div>
               <div className="text-sm text-foreground/70">Real-time Search</div>
             </div>
-            <div className="glass p-6 rounded-lg animate-fade-in neon-glow" style={{ animationDelay: '0.3s' }}>
+            <div className="card-professional p-8 animate-fade-in" style={{ animationDelay: '0.3s' }}>
               <TrendingUp className="w-8 h-8 text-primary mx-auto mb-2" />
               <div className="text-3xl font-bold">100%</div>
               <div className="text-sm text-foreground/70">Accuracy</div>
@@ -183,19 +185,19 @@ export default function Home() {
       </section>
 
       {results.length > 0 && (
-        <section className="relative py-20 px-4 border-t border-primary/20 animate-fade-in">
+        <section className="relative py-20 px-4 border-t border-border animate-fade-in">
           <div className="container mx-auto">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center justify-center gap-2 flex-1">
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center justify-center gap-3 flex-1">
                 <h2 className="text-3xl font-bold text-center animate-slide-in-left">Search Results</h2>
-                <span className="text-xs px-3 py-1 bg-primary/20 text-primary rounded font-mono">{selectedCategory}</span>
+                <span className="text-xs px-3 py-1 bg-primary/10 text-primary rounded-lg font-medium">{selectedCategory}</span>
               </div>
               {!isSearching && (
                 <button
                   onClick={() => setShowOnlyFound(!showOnlyFound)}
-                  className="ml-4 px-4 py-2 rounded-lg text-sm font-mono transition-all glass border border-primary/30 hover:border-primary/50 text-foreground/70 hover:text-primary"
+                  className="ml-4 px-4 py-2 rounded-lg text-sm font-medium transition-all bg-card border border-border text-foreground hover:bg-card/80 hover:border-primary/50"
                 >
-                  {showOnlyFound ? 'Afficher tous' : 'Afficher trouves'}
+                  {showOnlyFound ? 'Show All' : 'Found Only'}
                 </button>
               )}
             </div>
@@ -203,7 +205,7 @@ export default function Home() {
               {(showOnlyFound ? results.filter((r) => r.status === 'found') : results).map((result, idx) => (
                 <div
                   key={idx}
-                  className="glass p-4 rounded-lg border border-primary/20 hover:border-primary/50 transition animate-float-up neon-glow"
+                  className="card-professional p-4 animate-float-up"
                   style={{ animationDelay: `${idx * 0.1}s` }}
                 >
                   <div className="flex items-start justify-between mb-2">
