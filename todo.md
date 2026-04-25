@@ -61,3 +61,12 @@
 - [x] Ajouter les tests unitaires pour le filtrage (7 tests)
 - [x] Tester et valider le systeme de filtrage
 - [x] Sauvegarder et livrer la version finale avec filtrage
+
+
+## New Feature: Smart Results Display
+
+- [x] Afficher tous les sites en cours de recherche avec animation de progression
+- [x] Filtrer et afficher UNIQUEMENT les sites trouves a la fin de la recherche
+- [x] Ajouter un toggle pour basculer entre "Tous les resultats" et "Resultats trouves"
+- [x] Ajouter des tests unitaires pour cette nouvelle logique (7 tests)
+- [x] Tester et valider le nouveau comportement

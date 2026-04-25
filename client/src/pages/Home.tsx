@@ -26,6 +26,7 @@ export default function Home() {
   const [showLoading, setShowLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [categorizedSites, setCategorizedSites] = useState<Record<string, any[]>>({});
+  const [showOnlyFound, setShowOnlyFound] = useState(false);
   const categories = getTopCategories();
 
   useEffect(() => {
@@ -58,6 +59,7 @@ export default function Home() {
 
     setIsSearching(true);
     setResults([]);
+    setShowOnlyFound(false);
 
     const categoryData = categorizedSites[selectedCategory] || [];
     const siteNames = selectedCategory === 'All' 
@@ -82,6 +84,7 @@ export default function Home() {
     }
 
     setIsSearching(false);
+    setShowOnlyFound(true);
   };
 
   if (showLoading) {
@@ -182,12 +185,22 @@ export default function Home() {
       {results.length > 0 && (
         <section className="relative py-20 px-4 border-t border-primary/20 animate-fade-in">
           <div className="container mx-auto">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <h2 className="text-3xl font-bold text-center animate-slide-in-left">Search Results</h2>
-              <span className="text-xs px-3 py-1 bg-primary/20 text-primary rounded font-mono">{selectedCategory}</span>
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center justify-center gap-2 flex-1">
+                <h2 className="text-3xl font-bold text-center animate-slide-in-left">Search Results</h2>
+                <span className="text-xs px-3 py-1 bg-primary/20 text-primary rounded font-mono">{selectedCategory}</span>
+              </div>
+              {!isSearching && (
+                <button
+                  onClick={() => setShowOnlyFound(!showOnlyFound)}
+                  className="ml-4 px-4 py-2 rounded-lg text-sm font-mono transition-all glass border border-primary/30 hover:border-primary/50 text-foreground/70 hover:text-primary"
+                >
+                  {showOnlyFound ? 'Afficher tous' : 'Afficher trouves'}
+                </button>
+              )}
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-6xl mx-auto">
-              {results.map((result, idx) => (
+              {(showOnlyFound ? results.filter((r) => r.status === 'found') : results).map((result, idx) => (
                 <div
                   key={idx}
                   className="glass p-4 rounded-lg border border-primary/20 hover:border-primary/50 transition animate-float-up neon-glow"
