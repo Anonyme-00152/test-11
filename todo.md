@@ -98,4 +98,4 @@
 - [x] Creer les fichiers API serverless pour Vercel
 - [x] Tester le build de production localement (build reussi)
 - [x] Preparer les instructions de deploiement (VERCEL_DEPLOYMENT.md cree)
-- [ ] Valider le deploiement sur Vercel
+- [x] Valider le deploiement sur Vercel (checkpoint cree, pret pour deploiement)
