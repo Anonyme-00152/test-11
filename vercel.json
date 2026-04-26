@@ -7,28 +7,16 @@
   "env": {
     "NODE_ENV": "production"
   },
+  "outputDirectory": "dist",
+  "public": false,
   "rewrites": [
     {
       "source": "/api/(.*)",
       "destination": "/server/_core/index.ts"
-    }
-  ],
-  "headers": [
+    },
     {
       "source": "/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=3600, s-maxage=3600"
-        }
-      ]
-    }
-  ],
-  "redirects": [
-    {
-      "source": "/index.html",
-      "destination": "/",
-      "permanent": true
+      "destination": "/index.html"
     }
   ]
 }
